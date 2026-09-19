@@ -15,7 +15,8 @@ LedgerMate 360 is a multi tenant finance workspace for individuals, families and
 - Pending email invitations: an admin can assign a role before the person creates an account
 - Cash, bank, savings, wallet, credit, investment and custom accounts
 - Income, expense, transfer, loan and savings transactions backed by balanced ledger entries
-- Up to five images or PDFs on transaction and finance records
+- Up to five images or PDFs on transaction and finance records, including salary profiles
+- Card level file manager to preview, open, download, upload and delete evidence
 - Full edit popups for transactions, khata, loans, budgets, savings and salary profiles
 - Khata people, photos, receivable/payable balances and entries
 - Loan repayments, interest, due dates and status tracking
@@ -90,13 +91,47 @@ flowchart TD
     S --> P[Preview selected files]
     P -->|Remove| X[Click small X before saving]
     P -->|Keep| U[Upload with record]
-    U --> C[Evidence count and cover shown on card]
-    C --> E[Open edit popup]
-    E --> A[Add new evidence]
-    E --> D[Delete existing evidence]
-    A --> Z[Save complete update]
+    U --> C[Evidence count and image cover shown on card]
+    C --> M[Open View files manager]
+    M --> V[Preview image or PDF]
+    M --> W[Open or download file]
+    M --> A[Add more evidence up to 5]
+    M --> D[Delete one file with confirmation]
+    C --> E[Open full edit popup]
+    E --> R[Update record fields and evidence]
+    A --> Z[Card and file manager refresh]
     D --> Z
+    R --> Z
 ```
+
+## Advanced finance record flow
+
+```mermaid
+flowchart LR
+    L[Loans] --> C[Record card]
+    B[Budgets] --> C
+    S[Savings] --> C
+    Y[Salary] --> C
+    K[Khata] --> C
+    C --> F[View files]
+    C --> E[Edit all fields]
+    C --> D[Delete with app confirmation]
+    L --> P[Payment popup]
+    S --> A[Contribution popup]
+    F --> FP[Image and PDF preview]
+    F --> FD[Download]
+    F --> FU[Upload]
+    F --> FX[Delete file]
+    E --> API[NestJS workspace API]
+    P --> API
+    A --> API
+    FU --> API
+    FX --> API
+    API --> DB[(PostgreSQL and audit trail)]
+    DB --> R[Refresh cards, balances and reports]
+```
+
+Every finance card keeps its main actions together. **View files** manages supporting documents, **Edit** opens the complete record form, and **Delete** opens a LedgerMate confirmation dialog. Loan payments and savings contributions use validated amount popups instead of browser prompts.
 
 ## Architecture
 
