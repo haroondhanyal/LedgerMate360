@@ -7,3 +7,6 @@ coverage
 *.log
 *.tsbuildinfo
 packages/database/prisma/dev.db
+playwright-report/
+test-results/
+.playwright/

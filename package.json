@@ -2,17 +2,29 @@
   "name": "ledgermate-360",
   "private": true,
   "version": "0.1.0",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "concurrently -n web,api -c cyan,green \"npm run dev -w @ledgermate/web\" \"npm run dev -w @ledgermate/api\"",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
     "db:generate": "npm run generate -w @ledgermate/database",
     "db:migrate": "npm run migrate -w @ledgermate/database",
     "db:seed": "npm run seed -w @ledgermate/database",
     "db:studio": "npm run studio -w @ledgermate/database"
   },
-  "devDependencies": {"concurrently": "^9.2.1", "typescript": "^5.9.2"},
-  "engines": {"node": ">=20"}
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
 }

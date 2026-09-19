@@ -172,6 +172,20 @@ npm run dev
 
 Use demo credentials only for local development.
 
+## Automated testing
+
+```bash
+npm test                 # Finance engine and workspace unit tests
+npm run typecheck        # TypeScript checks across every package
+npm run test:e2e         # Playwright API and Chromium browser tests
+npm run test:e2e:ui      # Interactive Playwright test runner
+npm run test:e2e:report  # Open the latest HTML test report
+```
+
+The Playwright suite prepares an isolated demo login when needed and verifies API health, authentication, workspace access, dashboard navigation, search, sign out, the validated loan payment popup, and salary evidence upload/delete. Test records are removed after every scenario. Failed browser tests retain a screenshot and video; retried CI failures also include a trace.
+
+The GitHub Actions workflow runs database migrations, type checks, unit tests, the production build and Playwright Chromium tests on every push to `main` and every pull request. Its HTML Playwright report is uploaded as a workflow artifact.
+
 ## Repository structure
 
 ```text
