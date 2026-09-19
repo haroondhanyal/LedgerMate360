@@ -101,9 +101,12 @@ model PasswordResetToken {
   tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
+  approvedAt DateTime?
+  approvedById String?
   createdAt DateTime  @default(now())
 
   @@index([userId, expiresAt])
+  @@index([approvedAt, createdAt])
 }
 
 model Session {

@@ -10,3 +10,6 @@ packages/database/prisma/dev.db
 playwright-report/
 test-results/
 .playwright/
+automation/reports/
+automation/.auth/
+allure-results/
