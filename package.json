@@ -22,7 +22,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
     "allure:generate": "node automation/scripts/generate-allure.mjs",
-    "allure:open": "allure open automation/reports/allure-report",
+    "allure:open": "node automation/scripts/open-allure.mjs",
     "db:generate": "npm run generate -w @ledgermate/database",
     "db:migrate": "npm run migrate -w @ledgermate/database",
     "db:seed": "npm run seed -w @ledgermate/database",
