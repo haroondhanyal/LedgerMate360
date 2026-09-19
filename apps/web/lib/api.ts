@@ -6,4 +6,4 @@ export type Workspace={id:string;name:string;currency:string;timezone:string;mem
 export type Account={id:string;name:string;type:string;openingBalance:string;currentBalance:string;currency:string;color?:string};
 export type Category={id:string;name:string;kind:string;color?:string};
 export type Transaction={id:string;type:string;amount:string;date:string;description:string;status:string;account:Account;destinationAccount?:Account|null;evidence?:{id:string;fileName:string;mimeType:string;dataUrl?:string|null}[]};
-export type Summary={availableBalance:number;totalAssets:number;totalLiabilities:number;netWorth:number;monthlyIncome:number;monthlyExpense:number;monthlySavings:number;savingsRate:number};
+export type Summary={availableBalance:number;totalAssets:number;totalLiabilities:number;netWorth:number;monthlyIncome:number;monthlyExpense:number;monthlySavings:number;savingsRate:number;cashflowTrend?:{label:string;income:number;expense:number}[]};
