@@ -1,0 +1,1 @@
+import {Controller,Get} from "@nestjs/common";import {prisma} from "@ledgermate/database"; @Controller("health") export class HealthController{@Get() async check(){await prisma.$queryRaw`SELECT 1`;return {status:"ok",database:"connected",service:"ledgermate-api",timestamp:new Date().toISOString()}}}

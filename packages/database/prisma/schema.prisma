@@ -1,0 +1,580 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  OWNER
+  ADMIN
+  FINANCE_MANAGER
+  MEMBER
+  VIEWER
+  AUDITOR
+}
+
+enum AccountType {
+  CASH
+  BANK
+  SAVINGS
+  MOBILE_WALLET
+  CREDIT_CARD
+  INVESTMENT
+  LOAN
+  CUSTOM
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+  SAVINGS_TRANSFER
+  LOAN_TAKEN
+  LOAN_GIVEN
+  LOAN_REPAYMENT
+  LOAN_RECOVERY
+  RECEIVABLE
+  PAYABLE
+  ADJUSTMENT
+  INTEREST
+  FEE
+}
+
+enum TransactionStatus {
+  PENDING
+  CLEARED
+  OVERDUE
+  CANCELLED
+}
+
+enum LedgerSide {
+  DEBIT
+  CREDIT
+}
+
+enum KhataDirection {
+  GIVEN
+  RECEIVED
+}
+
+enum LoanDirection {
+  TAKEN
+  GIVEN
+}
+
+enum LoanStatus {
+  DRAFT
+  ACTIVE
+  OVERDUE
+  PAID
+  CLOSED
+  DISPUTED
+}
+
+model User {
+  id              String            @id @default(cuid())
+  email           String            @unique
+  passwordHash    String
+  name            String
+  phone           String?
+  country         String?
+  avatarUrl       String?
+  emailVerifiedAt DateTime?
+  memberships     WorkspaceMember[]
+  sessions        Session[]
+  isPlatformAdmin Boolean           @default(false)
+  preferences     UserPreference[]
+  notifications   Notification[]
+  passwordResets  PasswordResetToken[]
+  createdInvites  WorkspaceInvite[] @relation("InviteCreator")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, expiresAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  device    String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Workspace {
+  id            String            @id @default(cuid())
+  name          String
+  currency      String            @default("PKR")
+  timezone      String            @default("Asia/Karachi")
+  members       WorkspaceMember[]
+  accounts      Account[]
+  categories    Category[]
+  transactions  Transaction[]
+  ledgerEntries LedgerEntry[]
+  auditLogs     AuditLog[]
+  parties       Party[]
+  khataEntries  KhataEntry[]
+  loans         Loan[]
+  budgets       Budget[]
+  savingsGoals  SavingsGoal[]
+  salaryProfiles SalaryProfile[]
+  sharedExpenses SharedExpense[]
+  evidence       Evidence[]
+  recurringRules RecurringTransaction[]
+  imports        ImportBatch[]
+  subscriptions  Subscription[]
+  usageMetrics   UsageMetric[]
+  preferences    WorkspacePreference?
+  invitations    WorkspaceInvite[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        RoleName
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt    DateTime  @default(now())
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+model WorkspaceInvite {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  email       String
+  role        RoleName
+  invitedById String
+  invitedBy   User      @relation("InviteCreator", fields: [invitedById], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([workspaceId, email])
+  @@index([email])
+}
+
+model Account {
+  id                      String        @id @default(cuid())
+  workspaceId             String
+  workspace               Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name                    String
+  type                    AccountType
+  openingBalance          Decimal       @db.Decimal(18, 2)
+  currency                String
+  currentBalance          Decimal       @db.Decimal(18, 2)
+  institution             String?
+  isPrivate               Boolean       @default(false)
+  ownerId                 String?
+  color                   String?
+  icon                    String?
+  notes                   String?
+  isActive                Boolean       @default(true)
+  ledgerEntries           LedgerEntry[]
+  sourceTransactions      Transaction[] @relation("SourceAccount")
+  destinationTransactions Transaction[] @relation("DestinationAccount")
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId, isActive])
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  workspaceId  String
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name         String
+  kind         String
+  color        String?
+  transactions Transaction[]
+
+  @@unique([workspaceId, name, kind])
+}
+
+model Transaction {
+  id                   String            @id @default(cuid())
+  workspaceId          String
+  workspace            Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  type                 TransactionType
+  amount               Decimal           @db.Decimal(18, 2)
+  date                 DateTime
+  accountId            String
+  account              Account           @relation("SourceAccount", fields: [accountId], references: [id])
+  destinationAccountId String?
+  destinationAccount   Account?          @relation("DestinationAccount", fields: [destinationAccountId], references: [id])
+  categoryId           String?
+  category             Category?         @relation(fields: [categoryId], references: [id])
+  description          String
+  status               TransactionStatus @default(CLEARED)
+  notes                String?
+  createdById          String
+  ledgerEntries        LedgerEntry[]
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  archivedAt           DateTime?
+
+  @@index([workspaceId, date])
+  @@index([workspaceId, type])
+}
+
+model LedgerEntry {
+  id            String      @id @default(cuid())
+  workspaceId   String
+  workspace     Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  accountId     String
+  account       Account     @relation(fields: [accountId], references: [id])
+  side          LedgerSide
+  amount        Decimal     @db.Decimal(18, 2)
+  memo          String?
+  createdAt     DateTime    @default(now())
+
+  @@index([workspaceId, accountId])
+  @@index([transactionId])
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actorId     String
+  action      String
+  entityType  String
+  entityId    String
+  oldValue    Json?
+  newValue    Json?
+  ipAddress   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([workspaceId, createdAt])
+}
+
+model Party {
+  id          String       @id @default(cuid())
+  workspaceId String
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  type        String       @default("PERSON")
+  phone       String?
+  email       String?
+  avatarUrl   String?
+  notes       String?
+  isActive    Boolean      @default(true)
+  entries     KhataEntry[]
+  loans       Loan[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId, isActive])
+}
+
+model KhataEntry {
+  id          String         @id @default(cuid())
+  workspaceId String
+  workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  partyId     String
+  party       Party          @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  direction   KhataDirection
+  amount      Decimal        @db.Decimal(18, 2)
+  date        DateTime
+  dueDate     DateTime?
+  description String
+  status      String         @default("OPEN")
+  createdById String
+  createdAt   DateTime       @default(now())
+
+  @@index([workspaceId, date])
+  @@index([partyId, status])
+}
+
+model Loan {
+  id             String        @id @default(cuid())
+  workspaceId    String
+  workspace      Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  partyId        String?
+  party          Party?        @relation(fields: [partyId], references: [id])
+  name           String
+  direction      LoanDirection
+  principal      Decimal       @db.Decimal(18, 2)
+  interestRate   Decimal       @default(0) @db.Decimal(8, 4)
+  totalPaid      Decimal       @default(0) @db.Decimal(18, 2)
+  installment    Decimal?      @db.Decimal(18, 2)
+  frequency      String?
+  startDate      DateTime
+  endDate        DateTime?
+  nextDueDate    DateTime?
+  status         LoanStatus    @default(ACTIVE)
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([workspaceId, status])
+}
+
+model Budget {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  category    String
+  amount      Decimal   @db.Decimal(18, 2)
+  period      String    @default("MONTHLY")
+  threshold   Int       @default(80)
+  startsAt    DateTime
+  endsAt      DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([workspaceId, isActive])
+}
+
+model SavingsGoal {
+  id                  String    @id @default(cuid())
+  workspaceId         String
+  workspace           Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name                String
+  targetAmount        Decimal   @db.Decimal(18, 2)
+  savedAmount         Decimal   @default(0) @db.Decimal(18, 2)
+  monthlyContribution Decimal?  @db.Decimal(18, 2)
+  targetDate          DateTime?
+  priority            String    @default("MEDIUM")
+  isCompleted         Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([workspaceId, isCompleted])
+}
+
+model SalaryProfile {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  employer    String
+  grossSalary Decimal   @db.Decimal(18, 2)
+  netSalary   Decimal   @db.Decimal(18, 2)
+  tax         Decimal   @default(0) @db.Decimal(18, 2)
+  allowances  Decimal   @default(0) @db.Decimal(18, 2)
+  deductions  Decimal   @default(0) @db.Decimal(18, 2)
+  salaryDay   Int
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([workspaceId, isActive])
+}
+
+model SharedExpense {
+  id          String         @id @default(cuid())
+  workspaceId String
+  workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  description String
+  amount      Decimal        @db.Decimal(18, 2)
+  paidById    String
+  splitMethod String         @default("EQUAL")
+  date        DateTime
+  status      String         @default("OPEN")
+  splits      ExpenseSplit[]
+  createdAt   DateTime       @default(now())
+
+  @@index([workspaceId, date])
+}
+
+model ExpenseSplit {
+  id              String        @id @default(cuid())
+  sharedExpenseId String
+  sharedExpense   SharedExpense @relation(fields: [sharedExpenseId], references: [id], onDelete: Cascade)
+  memberId        String
+  amount          Decimal       @db.Decimal(18, 2)
+  isSettled       Boolean       @default(false)
+  settledAt       DateTime?
+
+  @@unique([sharedExpenseId, memberId])
+}
+
+model Evidence {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  relatedType String
+  relatedId   String
+  fileName    String
+  storageKey  String
+  mimeType    String
+  fileSize    Int
+  description String?
+  dataUrl     String?   @db.Text
+  uploadedBy  String
+  createdAt   DateTime  @default(now())
+
+  @@index([workspaceId, relatedType, relatedId])
+}
+
+model RecurringTransaction {
+  id            String    @id @default(cuid())
+  workspaceId   String
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name          String
+  type          String
+  amount        Decimal   @db.Decimal(18, 2)
+  frequency     String
+  nextRunAt     DateTime
+  accountId     String?
+  category      String?
+  isActive      Boolean   @default(true)
+  lastRunAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([workspaceId, nextRunAt])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  message   String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+}
+
+model ImportBatch {
+  id          String      @id @default(cuid())
+  workspaceId String
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  fileName    String
+  status      String      @default("PREVIEW")
+  totalRows   Int         @default(0)
+  validRows   Int         @default(0)
+  invalidRows Int         @default(0)
+  createdById String
+  rows        ImportRow[]
+  createdAt   DateTime    @default(now())
+  completedAt DateTime?
+
+  @@index([workspaceId, createdAt])
+}
+
+model ImportRow {
+  id        String      @id @default(cuid())
+  batchId   String
+  batch     ImportBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  rowNumber Int
+  rawData   Json
+  mappedData Json?
+  status    String
+  error     String?
+
+  @@unique([batchId, rowNumber])
+}
+
+model UserPreference {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String
+  dashboard   Json?
+  theme       String @default("INDIGO")
+  mode        String @default("SYSTEM")
+  font        String @default("DM Sans")
+  density     String @default("COMFORTABLE")
+
+  @@unique([userId, workspaceId])
+}
+
+model WorkspacePreference {
+  id             String    @id @default(cuid())
+  workspaceId    String    @unique
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  primaryColor   String    @default("#6658d9")
+  buttonStyle    String    @default("ROUNDED")
+  notificationSettings Json?
+  aiEnabled      Boolean   @default(true)
+}
+
+model SubscriptionPlan {
+  id            String        @id @default(cuid())
+  code          String        @unique
+  name          String
+  priceMonthly  Decimal       @default(0) @db.Decimal(12, 2)
+  isActive      Boolean       @default(true)
+  planFeatures  PlanFeature[]
+  subscriptions Subscription[]
+  createdAt     DateTime      @default(now())
+}
+
+model Feature {
+  id           String        @id @default(cuid())
+  code         String        @unique
+  name         String
+  description  String?
+  planFeatures PlanFeature[]
+}
+
+model PlanFeature {
+  id        String           @id @default(cuid())
+  planId    String
+  plan      SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  featureId String
+  feature   Feature          @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  enabled   Boolean          @default(true)
+  limit     Int?
+
+  @@unique([planId, featureId])
+}
+
+model Subscription {
+  id          String           @id @default(cuid())
+  workspaceId String
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  planId      String
+  plan        SubscriptionPlan @relation(fields: [planId], references: [id])
+  status      String           @default("TRIAL")
+  provider    String           @default("LOCAL")
+  trialEndsAt DateTime?
+  currentPeriodEnd DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([workspaceId, status])
+}
+
+model UsageMetric {
+  id          String    @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  metric      String
+  value       Int       @default(0)
+  period      String
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([workspaceId, metric, period])
+}

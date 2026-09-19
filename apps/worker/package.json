@@ -1,0 +1,1 @@
+{"name":"@ledgermate/worker","version":"0.1.0","private":true,"scripts":{"dev":"node --env-file=../../.env --experimental-strip-types src/index.ts","typecheck":"tsc --noEmit","build":"tsc"},"dependencies":{"@ledgermate/database":"*"},"devDependencies":{"@types/node":"^24.3.1","typescript":"^5.9.2"}}

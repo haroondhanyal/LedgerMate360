@@ -1,0 +1,3 @@
+import {prisma} from "@ledgermate/database";
+async function tick(){const now=new Date(),upcoming=new Date(now.getTime()+3*86400000);const rules=await prisma.recurringTransaction.findMany({where:{isActive:true,nextRunAt:{lte:upcoming}}});for(const rule of rules){const members=await prisma.workspaceMember.findMany({where:{workspaceId:rule.workspaceId,role:{in:["OWNER","ADMIN"]}}});for(const member of members)await prisma.notification.create({data:{userId:member.userId,type:"RECURRING_DUE",title:`${rule.name} is due`,message:`${rule.amount} is scheduled for ${rule.nextRunAt.toLocaleDateString()}`}})}console.log(JSON.stringify({level:"info",event:"worker.tick",rules:rules.length,at:now.toISOString()}))}
+tick().finally(()=>prisma.$disconnect());
