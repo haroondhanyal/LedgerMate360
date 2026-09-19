@@ -1,10 +1,17 @@
 import {After,Before,Given,Then,When,setDefaultTimeout,setWorldConstructor,World} from "@cucumber/cucumber";
 import {Browser,BrowserContext,Page,chromium,expect} from "@playwright/test";
+import {readFileSync} from "node:fs";
 import {env} from "../../core/config/env";
 class LedgerWorld extends World{browser!:Browser;context!:BrowserContext;page!:Page}
 setWorldConstructor(LedgerWorld);setDefaultTimeout(30_000);
 Before(async function(this:LedgerWorld){this.browser=await chromium.launch({headless:process.env.HEADED!=="true"});this.context=await this.browser.newContext({recordVideo:{dir:"automation/reports/videos"}});this.page=await this.context.newPage()});
-After(async function(this:LedgerWorld,scenario){if(scenario.result?.status!=="PASSED"){const shot=await this.page.screenshot({fullPage:true});this.attach(shot,"image/png")}await this.context?.close();await this.browser?.close()});
+After(async function(this:LedgerWorld){
+  const video=this.page?.video();
+  if(this.page&&!this.page.isClosed())this.attach(await this.page.screenshot({fullPage:true}),"image/png");
+  await this.context?.close();
+  if(video){const videoPath=await video.path();this.attach(Buffer.from(readFileSync(videoPath) as Buffer),"video/webm")}
+  await this.browser?.close();
+});
 async function authMode(page:Page,mode:string){if(mode==="register")return;const back=page.getByRole("button",{name:"Back to sign in"});await back.waitFor({state:"visible"});await back.click();if(mode==="forgot")await page.getByRole("button",{name:"Forgot password?"}).click()}
 async function signIn(page:Page){const response=await page.request.post(`${env.apiUrl}/auth/login`,{data:{email:env.email,password:env.password}});expect(response.ok()).toBeTruthy();const session=await response.json();await page.goto(env.webUrl);await page.evaluate(value=>localStorage.setItem("lm_session",JSON.stringify(value)),session);await page.reload();await expect(page.locator(".sidebar-user")).toBeVisible()}
 Given("I open LedgerMate authentication",async function(this:LedgerWorld){await this.page.goto(env.webUrl);await this.page.evaluate(()=>localStorage.clear());await this.page.reload()});

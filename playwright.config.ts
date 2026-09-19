@@ -9,11 +9,11 @@ export default defineConfig({
   forbidOnly:Boolean(process.env.CI),
   retries:process.env.CI?2:0,
   workers:process.env.CI?1:undefined,
-  reporter:process.env.CI?[["github"],["allure-playwright",{outputFolder:"automation/reports/allure-results"}],["html",{outputFolder:"automation/reports/playwright-html",open:"never"}]]:[["list"],["allure-playwright",{outputFolder:"automation/reports/allure-results"}],["html",{outputFolder:"automation/reports/playwright-html",open:"never"}]],
+  reporter:process.env.CI?[["github"],["allure-playwright",{resultsDir:process.env.ALLURE_RESULTS_DIR??"automation/reports/allure-results/playwright"}],["html",{outputFolder:"automation/reports/playwright-html",open:"never"}]]:[["list"],["allure-playwright",{resultsDir:process.env.ALLURE_RESULTS_DIR??"automation/reports/allure-results/playwright"}],["html",{outputFolder:"automation/reports/playwright-html",open:"never"}]],
   timeout:30_000,
   expect:{timeout:8_000},
   outputDir:"automation/reports/test-results",
-  use:{baseURL:env.webUrl,trace:"on-first-retry",screenshot:"only-on-failure",video:"retain-on-failure"},
+  use:{baseURL:env.webUrl,trace:"on",screenshot:"on",video:"on"},
   projects:[{name:"chromium",use:{...devices["Desktop Chrome"]}}],
   webServer:[
     {command:"npm run dev -w @ledgermate/api",url:`${env.apiUrl}/health`,reuseExistingServer:!process.env.CI,timeout:120_000},

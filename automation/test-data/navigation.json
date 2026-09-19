@@ -1,0 +1,4 @@
+{
+  "modules":["Dashboard","Workspace Admin","Transactions","Accounts","Salary","Khata","Loans","Budget","Savings","Shared Expenses","Reports","Import / Export","Recurring","Evidence","AI Assistant"],
+  "searchable":["Dashboard","Transactions","Accounts","Salary","Khata","Loans","Budget","Savings","Reports","AI Assistant"]
+}

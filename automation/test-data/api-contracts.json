@@ -1,0 +1,4 @@
+{
+  "protectedPaths":["/workspaces","/auth/profile","/notifications","/admin/summary"],
+  "requiredSessionFields":["user.id","user.name","user.email","accessToken"]
+}

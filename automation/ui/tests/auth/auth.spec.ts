@@ -1,0 +1,3 @@
+import {test,expect} from "../../../core/fixtures/test";
+const cases=[["register heading","Create your account"],["brand name","LedgerMate"],["tagline","Your money, khata, loans and savings"],["profile upload","Profile picture"],["country selector","Country"],["role selector","Workspace role"],["email field","Email address"],["password field","Password"],["confirm field","Confirm password"],["login switch","Back to sign in"]];
+test.describe("UI | Authentication | Positive and negative readiness",()=>{cases.forEach(([name,text],index)=>test(`UI-${String(index+26).padStart(3,"0")} auth ${name}`,async({page})=>{await page.goto("/");await expect(page.getByText(text,{exact:false}).first()).toBeVisible()}))});

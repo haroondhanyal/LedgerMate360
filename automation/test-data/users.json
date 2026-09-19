@@ -1,0 +1,7 @@
+{
+  "invalidUsers":[
+    {"email":"missing@example.com","password":"WrongPass123!","expectedStatus":401},
+    {"email":"invalid-email","password":"short","expectedStatus":400}
+  ],
+  "roles":["ADMIN","FINANCE_MANAGER","USER","VIEWER","AUDITOR"]
+}

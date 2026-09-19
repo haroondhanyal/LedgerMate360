@@ -184,6 +184,7 @@ npm run test:cucumber    # 40 Cucumber UI scenarios
 npm run test:automation  # Validate and run all 150 automated cases
 npm run test:e2e:ui      # Interactive Playwright test runner
 npm run test:e2e:report  # Open the latest HTML test report
+npm run allure:prepare   # Clean results and write environment, executor, categories and history
 npm run allure:generate  # Build combined API, UI and Cucumber Allure report
 npm run allure:open      # Open the generated Allure report
 ```
@@ -192,22 +193,26 @@ The dedicated [`automation`](automation) framework contains three independently 
 
 ```text
 automation/
-├── api/tests                 60 API automation cases
-├── ui/tests                  50 Playwright UI cases
+├── api/tests                 auth, security and contract API suites (60 cases)
+├── api/support               authenticated API session hooks
+├── ui/tests                  page and feature specific UI suites (50 cases)
 ├── cucumber/features         40 Gherkin scenarios
 ├── cucumber/steps            Cucumber Playwright steps and hooks
-├── core/config               local, QA and staging environment profiles
+├── config                    JSON environment and framework configuration
+├── test-data                 users, navigation and API contract JSON fixtures
+├── core/config               typed environment and JSON data readers
 ├── core/clients              reusable API client
-├── core/pages                authentication, dashboard and loan POMs
-├── core/fixtures             custom Playwright fixtures
-├── core/utils                data factories and Allure attachments
-├── scripts                   exact 150 case inventory validation
+├── core/locators             independent locator maps for every page area
+├── core/pages                reusable Page Objects with no test assertions hidden in selectors
+├── core/fixtures             custom fixtures and automatic evidence hook
+├── core/utils                seeded Faker factories and Allure attachments
+├── scripts                   inventory validation and branded Allure metadata/report generation
 └── reports                   Allure, HTML, screenshot, trace and video output
 ```
 
 Set `TEST_ENV=local|qa|staging`, then provide the matching `QA_WEB_URL`, `QA_API_URL`, `STAGING_WEB_URL` and `STAGING_API_URL` values when required. `TEST_EMAIL` and `TEST_PASSWORD` override the automation account without changing code.
 
-Playwright automatically captures screenshots on failure, videos for failed scenarios and traces on retry. Cucumber hooks attach a full page screenshot for failed scenarios and retain browser video. API payloads can be attached through the shared attachment helper. Playwright and Cucumber both write results into the same Allure results folder.
+Playwright captures a screenshot, video and trace for every browser test. Cucumber hooks attach a full page screenshot and WebM video for every scenario. API payloads can be attached through the shared attachment helper. Playwright and Cucumber write into one Allure results folder. The report includes the LedgerMate logo and title, executor/build details, environment values, product defect categories, suite hierarchy and retained trend history.
 
 The GitHub Actions workflow runs database migrations, type checks, unit tests, the production build and Playwright Chromium tests on every push to `main` and every pull request. Its HTML Playwright report is uploaded as a workflow artifact.
 
@@ -222,7 +227,7 @@ flowchart TD
     A --> R[Allure result files]
     U --> S[Screenshots, videos and traces]
     S --> R
-    C --> V[Cucumber failure screenshots and videos]
+    C --> V[Cucumber screenshots and videos for every scenario]
     V --> R
     R --> H[Combined LedgerMate Allure HTML report]
     H --> G[GitHub Actions artifact]
