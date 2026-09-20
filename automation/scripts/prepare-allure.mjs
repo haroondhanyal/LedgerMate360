@@ -12,7 +12,7 @@ const git=(...args)=>{try{return execFileSync("git",args,{encoding:"utf8"}).trim
 writeFileSync(`${results}/environment.properties`,[
   "Product=LedgerMate 360","Project=Product Automation","Environment="+(process.env.TEST_ENV??"local"),
   "Web.URL="+(process.env.WEB_URL??"http://localhost:3000"),"API.URL="+(process.env.API_URL??"http://localhost:4000/api"),
-  "Browser=Chromium","Node="+process.version,"OS="+`${os.platform()} ${os.release()}`,"Coverage=60 API + 50 UI + 40 BDD = 150"
+  "Browser=Chromium","Node="+process.version,"OS="+`${os.platform()} ${os.release()}`,"Coverage=100 API + 83 UI + 40 BDD = 223"
 ].join("\n"));
 writeFileSync(`${results}/executor.json`,JSON.stringify({name:"LedgerMate 360 Automation",type:"local",buildName:`LedgerMate 360 • ${git("rev-parse","--short","HEAD")}`,buildOrder:Date.now(),reportName:"API + UI + BDD Regression",url:"https://github.com/haroondhanyal/LedgerMate360"},null,2));
 writeFileSync(`${results}/categories.json`,JSON.stringify([

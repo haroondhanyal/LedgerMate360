@@ -178,10 +178,10 @@ Use demo credentials only for local development.
 npm test                 # Finance engine and workspace unit tests
 npm run typecheck        # TypeScript checks across every package
 npm run test:e2e         # Playwright API and Chromium browser tests
-npm run test:api         # 60 Playwright API contract and security cases
-npm run test:ui          # 50 Playwright UI smoke and regression cases
+npm run test:api         # 100 API contract, security and CRUD flow cases
+npm run test:ui          # 83 Playwright UI smoke, regression and E2E cases
 npm run test:cucumber    # 40 Cucumber UI scenarios
-npm run test:automation  # Validate and run all 150 automated cases
+npm run test:automation  # Validate and run all 223 automated cases
 npm run test:e2e:ui      # Interactive Playwright test runner
 npm run test:e2e:report  # Open the latest HTML test report
 npm run allure:prepare   # Clean results and write environment, executor, categories and history
@@ -189,13 +189,13 @@ npm run allure:generate  # Build combined API, UI and Cucumber Allure report
 npm run allure:open      # Open the generated Allure report
 ```
 
-The dedicated [`automation`](automation) framework contains three independently runnable sections: 60 API tests, 50 Playwright UI tests and 40 Cucumber UI scenarios. The inventory guard fails if the total differs from 150. It includes environment profiles, API clients, test fixtures, Page Object Models, data factories, attachment helpers, smoke and regression tags, and separate report output.
+The dedicated [`automation`](automation) framework contains three independently runnable sections: 100 API tests, 83 Playwright UI tests and 40 Cucumber UI scenarios. The inventory guard fails if the total differs from 223. It includes multiple data sets, positive and negative coverage, full CRUD journeys, account registration and sign-in lifecycle, PNG/PDF evidence uploads, environment profiles, API clients, test fixtures, Page Object Models, data factories, attachment helpers, smoke and regression tags, and separate report output.
 
 ```text
 automation/
-├── api/tests                 auth, security and contract API suites (60 cases)
+├── api/tests                 auth, security, contract and full CRUD API suites (100 cases)
 ├── api/support               authenticated API session hooks
-├── ui/tests                  page and feature specific UI suites (50 cases)
+├── ui/tests                  page, feature, auth lifecycle and finance E2E suites (83 cases)
 ├── cucumber/features         40 Gherkin scenarios
 ├── cucumber/steps            Cucumber Playwright steps and hooks
 ├── config                    JSON environment and framework configuration
@@ -220,9 +220,9 @@ The GitHub Actions workflow runs database migrations, type checks, unit tests, t
 
 ```mermaid
 flowchart TD
-    E[Select local, QA or staging environment] --> I[Validate exact 150 case inventory]
-    I --> A[60 Playwright API tests]
-    I --> U[50 Playwright UI tests]
+    E[Select local, QA or staging environment] --> I[Validate exact 223 case inventory]
+    I --> A[100 Playwright API tests]
+    I --> U[83 Playwright UI tests]
     I --> C[40 Cucumber UI scenarios]
     A --> R[Allure result files]
     U --> S[Screenshots, videos and traces]

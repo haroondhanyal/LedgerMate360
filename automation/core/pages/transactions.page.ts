@@ -1,0 +1,8 @@
+import type {Page} from "@playwright/test";import {expect} from "@playwright/test";import {resolve} from "node:path";import {transactionLocators} from "../locators/transactions.locators";
+export class TransactionsPage{
+ constructor(private page:Page){}
+ row(description:string){return transactionLocators(this.page).rows.filter({hasText:description})}
+ async reopen(){await this.page.reload();await this.page.locator(".sidebar-user").waitFor();await this.page.getByRole("button",{name:"Transactions",exact:true}).click()}
+ async createWithEvidence(description:string,amount:number){const l=transactionLocators(this.page);await l.add.click();await l.dialog.getByLabel(/Amount/).fill(String(amount));await l.dialog.getByLabel("Description").fill(description);await l.evidenceInput.setInputFiles([resolve("automation/assets/ledger-receipt.png"),resolve("automation/assets/ledger-invoice.pdf")]);await expect(l.dialog.getByText("ledger-receipt.png")).toBeVisible();await expect(l.dialog.getByText("ledger-invoice.pdf")).toBeVisible();const response=this.page.waitForResponse(r=>r.request().method()==="POST"&&r.url().includes("/transactions"));await l.save.evaluate((el:HTMLElement)=>el.click());expect((await response).ok()).toBeTruthy();await this.reopen();await expect(this.row(description)).toBeVisible();await expect(this.row(description)).toContainText("2")}
+ async archive(description:string){await this.row(description).getByTitle("Delete transaction").click();const response=this.page.waitForResponse(r=>r.request().method()==="DELETE"&&r.url().includes("/transactions/"));await transactionLocators(this.page).archive.click();expect((await response).ok()).toBeTruthy();await this.reopen();await expect(this.row(description)).toHaveCount(0)}
+}
