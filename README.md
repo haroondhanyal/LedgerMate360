@@ -187,6 +187,10 @@ npm run test:e2e:report  # Open the latest HTML test report
 npm run allure:prepare   # Clean results and write environment, executor, categories and history
 npm run allure:generate  # Build combined API, UI and Cucumber Allure report
 npm run allure:open      # Open the generated Allure report
+npm run performance:test # Run independent smoke, sustained-load and spike performance scenarios
+npm run performance:report # Generate the performance Allure report
+npm run performance:open # Open the detailed performance dashboard
+npm run reports:open     # Open functional Allure, performance Allure and performance dashboard
 ```
 
 The dedicated [`automation`](automation) framework contains three independently runnable sections: 100 API tests, 83 Playwright UI tests and 40 Cucumber UI scenarios. The inventory guard fails if the total differs from 223. It includes multiple data sets, positive and negative coverage, full CRUD journeys, account registration and sign-in lifecycle, PNG/PDF evidence uploads, environment profiles, API clients, test fixtures, Page Object Models, data factories, attachment helpers, smoke and regression tags, and separate report output.
@@ -213,6 +217,8 @@ automation/
 Set `TEST_ENV=local|qa|staging`, then provide the matching `QA_WEB_URL`, `QA_API_URL`, `STAGING_WEB_URL` and `STAGING_API_URL` values when required. `TEST_EMAIL` and `TEST_PASSWORD` override the automation account without changing code.
 
 Playwright captures a screenshot, video and trace for every browser test. Cucumber hooks attach a full page screenshot and WebM video for every scenario. API payloads can be attached through the shared attachment helper. Playwright and Cucumber write into one Allure results folder. The report includes the LedgerMate logo and title, executor/build details, environment values, product defect categories, suite hierarchy and retained trend history.
+
+All functional results are tagged and grouped as Smoke, Regression or Negative coverage. The independent performance runner measures a smoke baseline, five-user sustained load and fifteen-user traffic spike. It enforces P95 response time below 1500 ms and error rate below 1%, and produces both a branded HTML dashboard and a separate Allure performance report.
 
 The GitHub Actions workflow runs database migrations, type checks, unit tests, the production build and Playwright Chromium tests on every push to `main` and every pull request. Its HTML Playwright report is uploaded as a workflow artifact.
 
