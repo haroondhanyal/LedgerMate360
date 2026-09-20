@@ -35,6 +35,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
       - run: npm ci
       - run: npx prisma generate --schema packages/database/prisma/schema.prisma
       - run: npx prisma migrate deploy --schema packages/database/prisma/schema.prisma
@@ -46,12 +50,19 @@ jobs:
       - run: npm run test:api
       - run: npm run test:ui
       - run: npm run test:cucumber
+      - run: npm run performance:test
+      - run: npm run performance:report
+      - run: npm run allure:generate
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
+          name: ledgermate-automation-reports
           path: |
             automation/reports/playwright-html/
             automation/reports/allure-results/
+            automation/reports/allure-report/
+            automation/reports/performance/
+            automation/reports/performance-allure-results/
+            automation/reports/performance-allure-report/
             automation/reports/test-results/
           retention-days: 14

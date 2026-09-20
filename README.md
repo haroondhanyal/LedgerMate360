@@ -6,7 +6,30 @@
 
 <h3 align="center">Your money, khata, loans and savings — all in one place.</h3>
 
+<p align="center">
+  <strong>Next.js 15 · NestJS · PostgreSQL · Prisma · Playwright · Cucumber · Allure · k6</strong>
+</p>
+
+<p align="center">
+  <img alt="Functional cases" src="https://img.shields.io/badge/functional-300%20passed-0b806e" />
+  <img alt="Performance cases" src="https://img.shields.io/badge/performance-20%20passed-1769aa" />
+  <img alt="Combined report" src="https://img.shields.io/badge/Allure-320%20tests-f28c28" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178c6" />
+</p>
+
 LedgerMate 360 is a multi tenant finance workspace for individuals, families and small teams. It combines everyday money records with a balanced ledger, Pakistani style khata, loan and salary tracking, budgets, savings goals, evidence files, reports, role based collaboration and audit history.
+
+## Current quality status
+
+| Area | Coverage | Last complete run |
+|---|---:|---:|
+| API automation | 140 cases | Passed |
+| Playwright UI | 100 cases | Passed, one recovered retry |
+| Cucumber BDD | 60 scenarios | Passed |
+| Performance | 20 scenarios | Passed |
+| Combined Allure | 320 results | Generated |
+| Evidence | Screenshot, video and trace | Direct test attachments |
+| Categories | Smoke, Regression and Negative | Trend enabled |
 
 ## Product capabilities
 
@@ -192,6 +215,7 @@ npm run performance:k6   # Optional native k6 run of the 20-scenario workload
 npm run performance:report # Generate the performance Allure report
 npm run performance:open # Open the detailed performance dashboard
 npm run reports:open     # Open functional Allure, performance Allure and performance dashboard
+npm run test:complete    # Run 300 functional + 20 performance cases and generate every report
 ```
 
 The dedicated [`automation`](automation) framework contains three independently runnable functional sections: 140 API tests, 100 Playwright UI tests and 60 Cucumber UI scenarios. The inventory guard fails if the functional total differs from 300. A fourth section runs 20 performance scenarios. It includes multiple data sets, positive and negative coverage, full CRUD journeys, account registration and sign-in lifecycle, PNG/PDF evidence uploads, environment profiles, API clients, test fixtures, Page Object Models, data factories, attachment helpers, smoke and regression tags, and separate report output.
@@ -222,7 +246,31 @@ Playwright captures a screenshot, video and trace for every browser test. Cucumb
 
 All functional results are tagged and grouped as Smoke, Regression or Negative coverage. The dependency-free performance runner executes 20 smoke, sustained load, negative resilience and spike scenarios. It enforces P95 response time below 1500 ms and error rate below 1%. Performance results appear as a separate suite in the combined Allure report and in a dedicated branded HTML dashboard. A native k6 workload is also available when k6 is installed.
 
-The GitHub Actions workflow runs database migrations, type checks, unit tests, the production build and Playwright Chromium tests on every push to `main` and every pull request. Its HTML Playwright report is uploaded as a workflow artifact.
+The Cucumber and performance commands automatically start missing local API/Web services, wait for health readiness, and stop only the processes they started. Performance load and acceptance gates can be changed without code: `PERF_USER_SCALE=5 PERF_ITERATION_SCALE=10 PERF_P95_MS=1000 PERF_ERROR_RATE=0.005 npm run performance:test`. The default profile stays lightweight for local and CI regression; higher scale values provide load and stress runs.
+
+### Performance profiles
+
+| Profile | Command | Purpose |
+|---|---|---|
+| Baseline | `npm run performance:test` | Fast local and CI regression |
+| Load | `PERF_USER_SCALE=5 PERF_ITERATION_SCALE=10 npm run performance:test` | Sustained concurrent traffic |
+| Stress | `PERF_USER_SCALE=10 PERF_ITERATION_SCALE=20 npm run performance:test` | Capacity and degradation checks |
+| Native k6 | `K6_VUS=50 K6_ITERATIONS=500 npm run performance:k6` | Workload through an installed k6 engine |
+
+Every performance scenario records virtual users, iterations, request count, throughput, minimum, average, P50, P95, P99, maximum, error rate and threshold status. `PERF_P95_MS` and `PERF_ERROR_RATE` control the pass gates.
+
+### Generated reports
+
+| Report | Location |
+|---|---|
+| Combined functional and performance Allure | `automation/reports/allure-report/index.html` |
+| Dedicated performance Allure | `automation/reports/performance-allure-report/index.html` |
+| Detailed performance dashboard | `automation/reports/performance/index.html` |
+| Playwright HTML | `automation/reports/playwright-html/index.html` |
+
+Run `npm run reports:open` to open all main reports. Report directories are ignored by Git and uploaded as GitHub Actions artifacts for 14 days.
+
+The GitHub Actions workflow runs database migrations, type checks, unit tests, the production build, all 300 functional cases, all 20 performance scenarios, and combined Allure generation on every push to `main` and every pull request. Playwright, combined Allure and dedicated performance reports are uploaded together as a workflow artifact.
 
 ### Automation execution flow
 
