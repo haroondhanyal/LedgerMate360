@@ -4,5 +4,5 @@
   "reportTitle":"LedgerMate 360 • API + UI + BDD Automation",
   "browser":"Chromium",
   "evidence":{"screenshot":"every test","video":"every browser test","trace":"every Playwright test"},
-  "inventory":{"api":100,"ui":83,"bdd":40,"total":223}
+  "inventory":{"api":140,"ui":100,"bdd":60,"total":300}
 }

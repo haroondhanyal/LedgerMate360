@@ -178,29 +178,30 @@ Use demo credentials only for local development.
 npm test                 # Finance engine and workspace unit tests
 npm run typecheck        # TypeScript checks across every package
 npm run test:e2e         # Playwright API and Chromium browser tests
-npm run test:api         # 100 API contract, security and CRUD flow cases
-npm run test:ui          # 83 Playwright UI smoke, regression and E2E cases
-npm run test:cucumber    # 40 Cucumber UI scenarios
-npm run test:automation  # Validate and run all 223 automated cases
+npm run test:api         # 140 API contract, security and CRUD flow cases
+npm run test:ui          # 100 Playwright UI smoke, regression and E2E cases
+npm run test:cucumber    # 60 Cucumber UI scenarios
+npm run test:automation  # Validate and run all 300 functional cases
 npm run test:e2e:ui      # Interactive Playwright test runner
 npm run test:e2e:report  # Open the latest HTML test report
 npm run allure:prepare   # Clean results and write environment, executor, categories and history
 npm run allure:generate  # Build combined API, UI and Cucumber Allure report
 npm run allure:open      # Open the generated Allure report
 npm run performance:test # Run independent smoke, sustained-load and spike performance scenarios
+npm run performance:k6   # Optional native k6 run of the 20-scenario workload
 npm run performance:report # Generate the performance Allure report
 npm run performance:open # Open the detailed performance dashboard
 npm run reports:open     # Open functional Allure, performance Allure and performance dashboard
 ```
 
-The dedicated [`automation`](automation) framework contains three independently runnable sections: 100 API tests, 83 Playwright UI tests and 40 Cucumber UI scenarios. The inventory guard fails if the total differs from 223. It includes multiple data sets, positive and negative coverage, full CRUD journeys, account registration and sign-in lifecycle, PNG/PDF evidence uploads, environment profiles, API clients, test fixtures, Page Object Models, data factories, attachment helpers, smoke and regression tags, and separate report output.
+The dedicated [`automation`](automation) framework contains three independently runnable functional sections: 140 API tests, 100 Playwright UI tests and 60 Cucumber UI scenarios. The inventory guard fails if the functional total differs from 300. A fourth section runs 20 performance scenarios. It includes multiple data sets, positive and negative coverage, full CRUD journeys, account registration and sign-in lifecycle, PNG/PDF evidence uploads, environment profiles, API clients, test fixtures, Page Object Models, data factories, attachment helpers, smoke and regression tags, and separate report output.
 
 ```text
 automation/
-├── api/tests                 auth, security, contract and full CRUD API suites (100 cases)
+├── api/tests                 auth, security, contract and full CRUD API suites (140 cases)
 ├── api/support               authenticated API session hooks
-├── ui/tests                  page, feature, auth lifecycle and finance E2E suites (83 cases)
-├── cucumber/features         40 Gherkin scenarios
+├── ui/tests                  page, feature, auth lifecycle and finance E2E suites (100 cases)
+├── cucumber/features         60 Gherkin scenarios
 ├── cucumber/steps            Cucumber Playwright steps and hooks
 ├── config                    JSON environment and framework configuration
 ├── test-data                 users, navigation and API contract JSON fixtures
@@ -210,15 +211,16 @@ automation/
 ├── core/pages                reusable Page Objects with no test assertions hidden in selectors
 ├── core/fixtures             custom fixtures and automatic evidence hook
 ├── core/utils                seeded Faker factories and Allure attachments
+├── performance              20 scenario Node runner, HTML report and optional k6 workload
 ├── scripts                   inventory validation and branded Allure metadata/report generation
 └── reports                   Allure, HTML, screenshot, trace and video output
 ```
 
 Set `TEST_ENV=local|qa|staging`, then provide the matching `QA_WEB_URL`, `QA_API_URL`, `STAGING_WEB_URL` and `STAGING_API_URL` values when required. `TEST_EMAIL` and `TEST_PASSWORD` override the automation account without changing code.
 
-Playwright captures a screenshot, video and trace for every browser test. Cucumber hooks attach a full page screenshot and WebM video for every scenario. API payloads can be attached through the shared attachment helper. Playwright and Cucumber write into one Allure results folder. The report includes the LedgerMate logo and title, executor/build details, environment values, product defect categories, suite hierarchy and retained trend history.
+Playwright captures a screenshot, video and trace for every browser test. Cucumber attaches a full page screenshot and WebM video for every scenario. The report generator promotes evidence directly onto each test and removes Before Hooks and After Hooks sections. API payloads can be attached through the shared attachment helper. The report includes the LedgerMate logo and title, executor/build details, environment values, Smoke, Regression and Negative categories, suite hierarchy and retained trend history.
 
-All functional results are tagged and grouped as Smoke, Regression or Negative coverage. The independent performance runner measures a smoke baseline, five-user sustained load and fifteen-user traffic spike. It enforces P95 response time below 1500 ms and error rate below 1%, and produces both a branded HTML dashboard and a separate Allure performance report.
+All functional results are tagged and grouped as Smoke, Regression or Negative coverage. The dependency-free performance runner executes 20 smoke, sustained load, negative resilience and spike scenarios. It enforces P95 response time below 1500 ms and error rate below 1%. Performance results appear as a separate suite in the combined Allure report and in a dedicated branded HTML dashboard. A native k6 workload is also available when k6 is installed.
 
 The GitHub Actions workflow runs database migrations, type checks, unit tests, the production build and Playwright Chromium tests on every push to `main` and every pull request. Its HTML Playwright report is uploaded as a workflow artifact.
 
@@ -226,16 +228,18 @@ The GitHub Actions workflow runs database migrations, type checks, unit tests, t
 
 ```mermaid
 flowchart TD
-    E[Select local, QA or staging environment] --> I[Validate exact 223 case inventory]
-    I --> A[100 Playwright API tests]
-    I --> U[83 Playwright UI tests]
-    I --> C[40 Cucumber UI scenarios]
+    E[Select local, QA or staging environment] --> I[Validate exact 300 case inventory]
+    I --> A[140 Playwright API tests]
+    I --> U[100 Playwright UI tests]
+    I --> C[60 Cucumber UI scenarios]
+    E --> P[20 performance scenarios]
     A --> R[Allure result files]
     U --> S[Screenshots, videos and traces]
     S --> R
     C --> V[Cucumber screenshots and videos for every scenario]
     V --> R
-    R --> H[Combined LedgerMate Allure HTML report]
+    P --> R
+    R --> H[Combined 320 test LedgerMate Allure report]
     H --> G[GitHub Actions artifact]
 ```
 
