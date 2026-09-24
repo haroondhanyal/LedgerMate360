@@ -16,7 +16,7 @@ export default defineConfig({
   use:{baseURL:env.webUrl,trace:"on",screenshot:"on",video:"on"},
   projects:[{name:"chromium",use:{...devices["Desktop Chrome"]}}],
   webServer:[
-    {command:"npm run dev -w @ledgermate/api",url:`${env.apiUrl}/health`,reuseExistingServer:!process.env.CI,timeout:120_000},
-    {command:"npm run dev -w @ledgermate/web",url:env.webUrl,reuseExistingServer:!process.env.CI,timeout:120_000},
+    {command:"PORT=4001 WEB_URL=http://localhost:3001 npm run dev -w @ledgermate/api",url:`${env.apiUrl}/health`,reuseExistingServer:!process.env.CI,timeout:120_000},
+    {command:"PORT=3001 NEXT_PUBLIC_API_URL=http://localhost:4001/api npm run dev -w @ledgermate/web",url:env.webUrl,reuseExistingServer:!process.env.CI,timeout:120_000},
   ],
 });

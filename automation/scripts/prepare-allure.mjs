@@ -12,10 +12,10 @@ const git=(...args)=>{try{return execFileSync("git",args,{encoding:"utf8"}).trim
 writeFileSync(`${results}/environment.properties`,[
   "Product=LedgerMate 360","Project=Product Automation","Environment="+(process.env.TEST_ENV??"local"),
   "Report.Owner=Raja Haroon Jamal","Designation=Sr QA Automation",
-  "Web.URL="+(process.env.WEB_URL??"http://localhost:3000"),"API.URL="+(process.env.API_URL??"http://localhost:4000/api"),
-  "Browser=Chromium","Node="+process.version,"OS="+`${os.platform()} ${os.release()}`,"Functional.Coverage=140 API + 100 UI + 60 BDD = 300","Performance.Coverage=20 scenarios"
+  "Web.URL="+(process.env.WEB_URL??"http://localhost:3001"),"API.URL="+(process.env.API_URL??"http://localhost:4001/api"),
+  "Browser=Chromium","Node="+process.version,"OS="+`${os.platform()} ${os.release()}`,"Functional.Coverage=270 API + 100 UI + 60 BDD = 430","Performance.Coverage=20 scenarios"
 ].join("\n"));
-writeFileSync(`${results}/executor.json`,JSON.stringify({name:"Raja Haroon Jamal • Sr QA Automation",type:"local",buildName:`LedgerMate 360 • ${git("rev-parse","--short","HEAD")}`,buildOrder:Date.now(),reportName:"300 Functional + 20 Performance",url:"https://github.com/haroondhanyal/LedgerMate360"},null,2));
+writeFileSync(`${results}/executor.json`,JSON.stringify({name:"Raja Haroon Jamal • Sr QA Automation",type:"local",buildName:`LedgerMate 360 • ${git("rev-parse","--short","HEAD")}`,buildOrder:Date.now(),reportName:"430 Functional + 20 Performance",url:"https://github.com/haroondhanyal/LedgerMate360"},null,2));
 writeFileSync(`${results}/categories.json`,JSON.stringify([
   {name:"Product defects",matchedStatuses:["failed"],messageRegex:".*(Expected|expect).*"},
   {name:"Authentication and security",matchedStatuses:["failed"],traceRegex:".*(auth|login|password|role).*"},

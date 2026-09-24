@@ -11,9 +11,9 @@
 </p>
 
 <p align="center">
-  <img alt="Functional cases" src="https://img.shields.io/badge/functional-300%20passed-0b806e" />
-  <img alt="Performance cases" src="https://img.shields.io/badge/performance-20%20passed-1769aa" />
-  <img alt="Combined report" src="https://img.shields.io/badge/Allure-320%20tests-f28c28" />
+  <img alt="Functional cases" src="https://img.shields.io/badge/functional-430%20cases-0b806e" />
+  <img alt="Performance cases" src="https://img.shields.io/badge/performance-20%2F20%20passed-1769aa" />
+  <img alt="Combined report" src="https://img.shields.io/badge/Allure-450%20tests-f28c28" />
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178c6" />
 </p>
 
@@ -23,13 +23,15 @@ LedgerMate 360 is a multi tenant finance workspace for individuals, families and
 
 | Area | Coverage | Last complete run |
 |---|---:|---:|
-| API automation | 140 cases | Passed |
-| Playwright UI | 100 cases | Passed, one recovered retry |
-| Cucumber BDD | 60 scenarios | Passed |
-| Performance | 20 scenarios | Passed |
-| Combined Allure | 320 results | Generated |
+| API automation | 270 cases | 270 passed |
+| Playwright UI | 100 cases | 100 passed |
+| Cucumber BDD | 60 scenarios | 60 passed |
+| Performance | 20 scenarios | 20 passed |
+| Combined Allure | 450 results | 450 passed |
 | Evidence | Screenshot, video and trace | Direct test attachments |
 | Categories | Smoke, Regression and Negative | Trend enabled |
+
+Fresh complete automation run on **24 September 2026**: **450/450 passed, 0 failed**. This combines 430 functional cases with 20 measured k6 workloads.
 
 ## Product capabilities
 
@@ -201,10 +203,10 @@ Use demo credentials only for local development.
 npm test                 # Finance engine and workspace unit tests
 npm run typecheck        # TypeScript checks across every package
 npm run test:e2e         # Playwright API and Chromium browser tests
-npm run test:api         # 140 API contract, security and CRUD flow cases
+npm run test:api         # 270 API contract, security and CRUD flow cases
 npm run test:ui          # 100 Playwright UI smoke, regression and E2E cases
 npm run test:cucumber    # 60 Cucumber UI scenarios
-npm run test:automation  # Validate and run all 300 functional cases
+npm run test:automation  # Validate and run all 430 functional cases
 npm run test:e2e:ui      # Interactive Playwright test runner
 npm run test:e2e:report  # Open the latest HTML test report
 npm run allure:prepare   # Clean results and write environment, executor, categories and history
@@ -215,14 +217,14 @@ npm run performance:k6   # Optional native k6 run of the 20-scenario workload
 npm run performance:report # Generate the performance Allure report
 npm run performance:open # Open the detailed performance dashboard
 npm run reports:open     # Open functional Allure, performance Allure and performance dashboard
-npm run test:complete    # Run 300 functional + 20 performance cases and generate every report
+npm run test:complete    # Run 430 functional + 20 performance cases and generate every report
 ```
 
-The dedicated [`automation`](automation) framework contains three independently runnable functional sections: 140 API tests, 100 Playwright UI tests and 60 Cucumber UI scenarios. The inventory guard fails if the functional total differs from 300. A fourth section runs 20 performance scenarios. It includes multiple data sets, positive and negative coverage, full CRUD journeys, account registration and sign-in lifecycle, PNG/PDF evidence uploads, environment profiles, API clients, test fixtures, Page Object Models, data factories, attachment helpers, smoke and regression tags, and separate report output.
+The dedicated [`automation`](automation) framework contains three independently runnable functional sections: 270 API tests, 100 Playwright UI tests and 60 Cucumber UI scenarios. The inventory guard fails if the functional total differs from 430. A fourth section runs 20 performance scenarios. It includes multiple data sets, positive and negative coverage, full CRUD journeys, account registration and sign-in lifecycle, PNG/PDF evidence uploads, environment profiles, API clients, test fixtures, Page Object Models, data factories, attachment helpers, smoke and regression tags, and separate report output.
 
 ```text
 automation/
-├── api/tests                 auth, security, contract and full CRUD API suites (140 cases)
+├── api/tests                 auth, security, contract and full CRUD API suites (270 cases)
 ├── api/support               authenticated API session hooks
 ├── ui/tests                  page, feature, auth lifecycle and finance E2E suites (100 cases)
 ├── cucumber/features         60 Gherkin scenarios
@@ -244,7 +246,7 @@ Set `TEST_ENV=local|qa|staging`, then provide the matching `QA_WEB_URL`, `QA_API
 
 Playwright captures a screenshot, video and trace for every browser test. Cucumber attaches a full page screenshot and WebM video for every scenario. The report generator promotes evidence directly onto each test and removes Before Hooks and After Hooks sections. API payloads can be attached through the shared attachment helper. The report includes the LedgerMate logo and title, executor/build details, environment values, Smoke, Regression and Negative categories, suite hierarchy and retained trend history.
 
-All functional results are tagged and grouped as Smoke, Regression or Negative coverage. The dependency-free performance runner executes 20 smoke, sustained load, negative resilience and spike scenarios. It enforces P95 response time below 1500 ms and error rate below 1%. Performance results appear as a separate suite in the combined Allure report and in a dedicated branded HTML dashboard. A native k6 workload is also available when k6 is installed.
+All functional results are tagged and grouped as Smoke, Regression or Negative coverage. The native k6 runner executes 20 smoke, sustained-load, negative-resilience and spike workloads. Each workload enforces P95 response time below 1500 ms, error rate below 1% and a 100% content-check pass rate. Performance results appear as a separate suite in the combined Allure report and in a dedicated branded HTML dashboard, alongside Grafana k6's interactive time-series report.
 
 The Cucumber and performance commands automatically start missing local API/Web services, wait for health readiness, and stop only the processes they started. Performance load and acceptance gates can be changed without code: `PERF_USER_SCALE=5 PERF_ITERATION_SCALE=10 PERF_P95_MS=1000 PERF_ERROR_RATE=0.005 npm run performance:test`. The default profile stays lightweight for local and CI regression; higher scale values provide load and stress runs.
 
@@ -270,14 +272,30 @@ Every performance scenario records virtual users, iterations, request count, thr
 
 Run `npm run reports:open` to open all main reports. Report directories are ignored by Git and uploaded as GitHub Actions artifacts for 14 days.
 
-The GitHub Actions workflow runs database migrations, type checks, unit tests, the production build, all 300 functional cases, all 20 performance scenarios, and combined Allure generation on every push to `main` and every pull request. Playwright, combined Allure and dedicated performance reports are uploaded together as a workflow artifact.
+The GitHub Actions workflow runs database migrations, type checks, unit tests, the production build, all 430 functional cases, all 20 performance scenarios, and combined Allure generation on every push to `main` and every pull request. Playwright, combined Allure and dedicated performance reports are uploaded together as a workflow artifact.
+
+### Latest report screenshots
+
+These screenshots were captured from the fresh 450/450 passing run above. The Allure report combines API, UI, BDD and performance results; the native Playwright report shows all 100 UI cases passing; the k6 dashboard includes measured workload latency and pass totals.
+
+#### Combined Allure report
+
+![LedgerMate 360 combined Allure report showing 450 passing tests](automation/screenshots/allure-combined.png)
+
+#### k6 performance dashboard
+
+![LedgerMate 360 k6 performance dashboard with all 20 workloads passing](automation/screenshots/k6-dashboard.png)
+
+#### Playwright UI report
+
+![LedgerMate 360 Playwright report showing 100 UI tests passing](automation/screenshots/playwright-html.png)
 
 ### Automation execution flow
 
 ```mermaid
 flowchart TD
-    E[Select local, QA or staging environment] --> I[Validate exact 300 case inventory]
-    I --> A[140 Playwright API tests]
+    E[Select local, QA or staging environment] --> I[Validate exact 430 functional case inventory]
+    I --> A[270 Playwright API tests]
     I --> U[100 Playwright UI tests]
     I --> C[60 Cucumber UI scenarios]
     E --> P[20 performance scenarios]
@@ -287,7 +305,7 @@ flowchart TD
     C --> V[Cucumber screenshots and videos for every scenario]
     V --> R
     P --> R
-    R --> H[Combined 320 test LedgerMate Allure report]
+    R --> H[Combined 450 test LedgerMate Allure report]
     H --> G[GitHub Actions artifact]
 ```
 

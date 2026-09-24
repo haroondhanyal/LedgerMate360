@@ -1,8 +1,17 @@
 {
-  "product":"LedgerMate 360",
-  "project":"LedgerMate 360 Product Automation",
-  "reportTitle":"LedgerMate 360 • API + UI + BDD Automation",
-  "browser":"Chromium",
-  "evidence":{"screenshot":"every test","video":"every browser test","trace":"every Playwright test"},
-  "inventory":{"api":140,"ui":100,"bdd":60,"total":300}
+  "product": "LedgerMate 360",
+  "project": "LedgerMate 360 Product Automation",
+  "reportTitle": "LedgerMate 360 \u2022 API + UI + BDD Automation",
+  "browser": "Chromium",
+  "evidence": {
+    "screenshot": "every test",
+    "video": "every browser test",
+    "trace": "every Playwright test"
+  },
+  "inventory": {
+    "api": 270,
+    "ui": 100,
+    "bdd": 60,
+    "total": 430
+  }
 }

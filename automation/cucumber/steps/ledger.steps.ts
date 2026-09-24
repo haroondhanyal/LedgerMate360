@@ -13,7 +13,7 @@ After(async function(this:LedgerWorld){
   await this.browser?.close();
 });
 async function authMode(page:Page,mode:string){if(mode==="register")return;const back=page.getByRole("button",{name:"Back to sign in"});await back.waitFor({state:"visible"});await back.click();if(mode==="forgot")await page.getByRole("button",{name:"Forgot password?"}).click()}
-async function signIn(page:Page){const response=await page.request.post(`${env.apiUrl}/auth/login`,{data:{email:env.email,password:env.password}});expect(response.ok()).toBeTruthy();const session=await response.json();await page.goto(env.webUrl);await page.evaluate(value=>localStorage.setItem("lm_session",JSON.stringify(value)),session);await page.reload();await expect(page.locator(".sidebar-user")).toBeVisible()}
+async function signIn(page:Page){await page.goto(env.webUrl);await page.getByRole("button",{name:"Back to sign in"}).click();await page.getByLabel("Email address").fill(env.email);await page.getByLabel("Password",{exact:true}).fill(env.password);await page.getByRole("button",{name:"Sign in",exact:true}).click();await expect(page.locator(".sidebar-user")).toBeVisible({timeout:20_000})}
 Given("I open LedgerMate authentication",async function(this:LedgerWorld){await this.page.goto(env.webUrl);await this.page.evaluate(()=>localStorage.clear());await this.page.reload()});
 Given("I am signed in to LedgerMate",async function(this:LedgerWorld){await signIn(this.page)});
 When("I choose authentication mode {string}",async function(this:LedgerWorld,mode:string){await authMode(this.page,mode)});
